@@ -1,17 +1,19 @@
 <?php
 
-public class Users {
-    //public _construct() {}
+class Users {
+    function _construct() {}
 
-    updateUser() {
-
+    function updateUser() {
+        Response::setResponse(true, "User updated");
     }
 
-    getAllUsers() {
-
+    function getAllUsers() {
+        $users = array();
+        Response::setResponse(true, "Users retrieved", $users);
     }
 
-    deleteUser() {
-        
+    function deleteUser() {
+        Response::setResponse(false, "User deleted");
+        return;   // Is this really nessaray?    
     }
 }
