@@ -2,20 +2,24 @@
 
 class Response{
 
+    public static $response;
+
+    // Initialize session response
     static function initResponse(){
-        Response::setResponse(true, 'Success');
+        self::setResponse('Success', true);
     }
 
-    static function setResponse($suc, $msg, $val = array()){
-        $_SESSION['RESPONSE'] = array(
+    // Sets the response Success is false by default
+    static function setResponse($msg, $suc = false, $val = array()){
+        self::$response = array(
             'success' => $suc,
             'message' => $msg,
             'values' => $val
         );
     }
 
+    // Get the global session reponse
     static function getResponse(){
-        return $_SESSION['RESPONSE'];
+        return self::$response;
     }
-
 }
