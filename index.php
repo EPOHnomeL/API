@@ -39,7 +39,7 @@ $queryParams = Utils::separateURLQuery($query);
 $queryParams = Utils::sanitiseURLQuery($queryParams);
 // Check if validation fails
 if(!Utils::validateURLQuery($queryParams)){
-    echo json_encode(Response::getResponse());
+    echo json_encode(Response::getResponse(), JSON_PRETTY_PRINT);
     exit(0);
 };
 
@@ -47,7 +47,7 @@ if(!Utils::validateURLQuery($queryParams)){
 Utils::runURLQuery();
 
 // Send the response back
-echo json_encode(Response::getResponse());
+echo json_encode(Response::getResponse(), JSON_PRETTY_PRINT);
 exit(0);
 
 ?>
