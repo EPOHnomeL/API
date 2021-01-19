@@ -45,6 +45,14 @@ class Sql {
         return $resultArray;
     }
 
+    // Run query and return results
+    public static function update($query) {
+        self::connect();
+        $result = mysqli_query(self::$conn, $query);
+        // Update statements return either true or 
+        return $result;
+    }
+
     public static function sanitise($field){
         self::connect();
         $field = mysqli_real_escape_string(self::$conn, $field);

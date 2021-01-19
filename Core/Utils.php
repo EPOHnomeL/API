@@ -88,4 +88,16 @@ class Utils{
         $funcName = self::$_funcName;
         $obj->$funcName(); 
     }    
+
+    static function getHttpPayload(){       // Correct name??             
+        $json = file_get_contents('php://input');
+        $user = json_decode($json, true);
+
+        $username = Sql::sanitise($user['username']);
+        $password = Sql::sanitise($user['password']);
+        $email = Sql::sanitise($user['email']);
+        $role = $user['role'];
+
+        return [$username, $password, $email, $role];
+    }
 }
