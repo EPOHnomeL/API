@@ -89,7 +89,7 @@ class Utils{
         $obj->$funcName(); 
     }    
 
-    static function getHttpPayload(){       // Correct name??             
+    static function getUserDetailsFromFrontend(){                   
         $json = file_get_contents('php://input');
         $user = json_decode($json, true);
 

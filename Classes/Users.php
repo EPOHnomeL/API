@@ -6,7 +6,7 @@ class Users {
 
     function createUser(){
         
-        list($username, $password, $email, $role) = Utils::getHttpPayload();  
+        list($username, $password, $email, $role) = Utils::getUserDetailsFromFrontend();  
 
         $confirmed = 1;
         $tokenExpiry = 0;
