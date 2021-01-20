@@ -6,14 +6,14 @@ class Users {
 
     function createUser(){
         
-        list($username, $password, $email, $role) = Utils::getUserDetailsFromFrontend();  
+        list($username, $password, $email, $role) = Utils::getUserDetails();  
 
         $confirmed = 1;
         $tokenExpiry = 0;
         $dat = date('Y-m-d H:i:s');
 
         $result = Sql::execute(
-            "INSERT INTO users(Name, Password, Email, Email_Confirmed, Role, Token_Expiry, Last_Login) ".
+            "INSERT INTO users(Username, `Password`, Email, Email_Confirmed, `Role`, Token_Expiry, Last_Login) ".
             "VALUES('$username', '$password', '$email', '$confirmed', '$role', '$tokenExpiry', '$dat')"
         );
         if($result === false){

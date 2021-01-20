@@ -32,10 +32,13 @@ class Sql {
         self::connect();
         $result = mysqli_query(self::$conn, $query);
         if($result === false){
+            self::$conn->close(); 
             return $result;
         }
         if($result->num_rows === 1){
-            return $result->fetch_assoc();
+            $val = $result->fetch_assoc();
+            self::$conn->close(); 
+            return $val;
         }        
         $resultArray = array();
         while($val = $result->fetch_assoc()){

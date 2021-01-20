@@ -10,7 +10,7 @@ class Auth{
     function login(){
 
         // Get information from frontend
-        list($username, $password) = Utils::getUserDetailsFromFrontend();
+        list($username, $password) = Utils::getUserDetails();
 
         // Check to see if user details are correct
         $validUser = self::checkUserDetails($username, $password);
@@ -37,17 +37,21 @@ class Auth{
             return;
         }
 
-        // Successfully login user and send token back to user
+        // Get email from database
+        $email = self::getUserField($username, 'Email');
+
+        // Successfully login user and send user details back to frontend
         $values = array( 
             'username'=> $username,
-            'token' => $token );
+            'token' => $token,
+            'email' => $email, );
         Response::setResponse("User session successfully created", true, $values);
     }
 
     function logout(){
 
         // Get username from fronend
-        list($username) = Utils::getUserDetailsFromFrontend();
+        list($username) = Utils::getUserDetails();
 
         // Clear token
         $result = self::storeToken($username, '', 0);
@@ -67,7 +71,9 @@ class Auth{
     private static function checkUserDetails($username, $password){
         
         // Get details of user via SQL
-        $result = Sql::execute("SELECT * FROM users WHERE `Name` = '$username'");
+        $result = Sql::execute(
+            "SELECT * FROM users WHERE Username = '$username'"
+        );
         if($result === false){
             return false;
         }
@@ -77,11 +83,18 @@ class Auth{
         }
         return true;
     }    
+
+    private static function getUserField($username, $field){
+        $result = Sql::execute(
+            "SELECT $field FROM users WHERE Username = '$username'"
+        );
+        return $result["$field"];
+    }
     
     private static function storeToken($username, $token, $tokenExpiry){
         // Update token values
         $result = Sql::update(
-            "UPDATE users SET Token = '$token', Token_Expiry = '$tokenExpiry' WHERE `Name`= '$username'"
+            "UPDATE users SET Token = '$token', Token_Expiry = '$tokenExpiry' WHERE Username= '$username'"
         );
         return $result;
     }
@@ -91,7 +104,7 @@ class Auth{
         $dat = date('Y-m-d H:i:s');
         // Update last login
         $result = Sql::update(
-            "UPDATE users SET Last_Login = '$dat' WHERE `Name` = '$username'"
+            "UPDATE users SET Last_Login = '$dat' WHERE Username = '$username'"
         );
         return $result;
     }
