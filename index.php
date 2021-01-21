@@ -42,7 +42,15 @@ if(!Utils::validateURLQuery($queryParams)){
     echo json_encode(Response::getResponse(), JSON_PRETTY_PRINT);
     exit(0);
 };
-
+/*
+create array of exceptions
+check if function is exception
+Run Auth::authorize() return (array = (success, message))
+if(success is false)
+response set response to authorize message
+else
+Utils::runURLQuery();
+*/
 // Run request
 Utils::runURLQuery();
 

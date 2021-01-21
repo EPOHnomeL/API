@@ -4,7 +4,7 @@ class Response{
 
     public static $response;
 
-    // Initialize session response
+    // Initialize response
     static function initResponse(){
         self::setResponse('Success', true);
     }
@@ -18,7 +18,7 @@ class Response{
         );
     }
 
-    // Get the global session reponse
+    // Get the reponse
     static function getResponse(){
         return self::$response;
     }

@@ -63,9 +63,33 @@ class Auth{
         Response::setResponse("User successfully Logged Out", true);     
     }
 
-    function authorise(){
-        // token autherization and timing
+    function authorize(){
 
+        // Get the contents of the response from the frontend               
+        $json = file_get_contents('php://input');
+        // Decode it as an array
+        $result = json_decode($json, true);
+
+        // Get username and token data
+        list($username) = Utils::getUserDetails();
+        $tokenIn = $result['token'];
+        $token = self::getUserField($username, 'Token');
+        // Check if tokens match
+        if($tokenIn !== $token){
+            Response::setResponse("Could not autorize token");
+            return;
+        }        
+
+        // Get token Expiry and time
+        $tokenExpiry = self::getUserField($username, 'Token_Expiry');
+        $timeIn = time();
+        // Check if time expired
+        if($timeIn >= $tokenExpiry){
+            Response::setResponse("Session Expired");
+            return;
+        }
+        // Send response back
+        Response::setResponse("User authorized", true);
     }
 
     private static function checkUserDetails($username, $password){
@@ -74,6 +98,7 @@ class Auth{
         $result = Sql::execute(
             "SELECT * FROM users WHERE Username = '$username'"
         );
+        // Check if response failed
         if($result === false){
             return false;
         }
@@ -85,9 +110,11 @@ class Auth{
     }    
 
     private static function getUserField($username, $field){
+        // Execute the query
         $result = Sql::execute(
             "SELECT $field FROM users WHERE Username = '$username'"
         );
+        // return the field as a value
         return $result["$field"];
     }
     
@@ -96,6 +123,7 @@ class Auth{
         $result = Sql::update(
             "UPDATE users SET Token = '$token', Token_Expiry = '$tokenExpiry' WHERE Username= '$username'"
         );
+        // Returns boolean
         return $result;
     }
 

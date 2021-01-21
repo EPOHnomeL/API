@@ -15,6 +15,7 @@ class Sql {
 
     // Connect to Databse server
     private static function connect(){
+        // Create connection object
         self::$conn = new mysqli(
             self::CON_DETAILS['host'],
             self::CON_DETAILS['user'],
@@ -22,6 +23,7 @@ class Sql {
             self::CON_DETAILS['database']
         );
 
+        // Check if error occured
         if (self::$conn->connect_error) {
             Response::setResponse("Connection failed: " . self::$conn->connect_error);
         };
@@ -29,17 +31,28 @@ class Sql {
 
     // Run query and return results
     public static function execute($query) {
+        // Connect to databse
         self::connect();
+        // Execute query and return result
         $result = mysqli_query(self::$conn, $query);
+        // Check if response failed
         if($result === false){
             self::$conn->close(); 
             return $result;
         }
+        // Check if response only succeeded and did not return anything
+        if($result === true) {
+            return $result;
+        }
+        // Check if there is only 1 row
         if($result->num_rows === 1){
+            // Return as associative array
             $val = $result->fetch_assoc();
+            // Close connection
             self::$conn->close(); 
             return $val;
         }        
+        // Build final array of the databse
         $resultArray = array();
         while($val = $result->fetch_assoc()){
             array_push($resultArray, $val);
@@ -56,8 +69,11 @@ class Sql {
         return $result;
     }
 
+    // Santise for SQL injection
     public static function sanitise($field){
+        // Connect to database
         self::connect();
+        // Run escape to escape the SQL syntax
         $field = mysqli_real_escape_string(self::$conn, $field);
         self::$conn->close();
         return $field;

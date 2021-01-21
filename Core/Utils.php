@@ -84,20 +84,26 @@ class Utils{
 
     // Runs the function on the obj
     static function runURLQuery(){
+        // Instanciate object
         $obj = new self::$_objName();
         $funcName = self::$_funcName;
+        // Run function on selected object class
         $obj->$funcName(); 
     }    
 
-    static function getUserDetails(){                   
+    static function getUserDetails(){    
+        // Get the contents of the response from the frontend               
         $json = file_get_contents('php://input');
+        // Decode it as an array
         $user = json_decode($json, true);
 
+        // Sanitise all fields of user
         $username = array_key_exists('username', $user) ? Sql::sanitise($user['username']) : '';
         $password = array_key_exists('password', $user) ? Sql::sanitise($user['password']) : '';
         $email = array_key_exists('email', $user) ? Sql::sanitise($user['email']) : '';
         $role = array_key_exists('role', $user) ? Sql::sanitise($user['role']) : '';
 
+        // Return results
         return [$username, $password, $email, $role];
     }
 }
