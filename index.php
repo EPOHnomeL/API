@@ -11,18 +11,17 @@ header("Content-Type: text/json; charset=UTF-8");
 include './Core/Utils.php';
 include './Core/Response.php';
 include './Core/Sql.php';
+include './Core/Auth.php';
 
-// All functions have side effect of changing
-// Therefore get the response from Response::getResponse()
+// Array of function where the user is not going to be authorized
+const EXCEPTIONS_AUTHORIZE = array(
+    "createUser",
+    "login",
+);
 
-// TODO:
-// authenticate requests
-
-// Initialize response 
+// Initialize response anf timezone
 Response::initResponse();
 date_default_timezone_set('Africa/Johannesburg');
-
-// all request go to $_SERVER['REDIRECT_QUERY_STRING']
 
 // Check if query parameters are not 0
 if (!isset($_SERVER['REDIRECT_QUERY_STRING'])){
@@ -42,17 +41,37 @@ if(!Utils::validateURLQuery($queryParams)){
     echo json_encode(Response::getResponse(), JSON_PRETTY_PRINT);
     exit(0);
 };
-/*
-create array of exceptions
-check if function is exception
-Run Auth::authorize() return (array = (success, message))
-if(success is false)
-response set response to authorize message
-else
-Utils::runURLQuery();
-*/
-// Run request
-Utils::runURLQuery();
+
+// Variable to see if fucntion is exception
+$isException = false;
+// Loop through exceptions and check if function is one.
+for ($i=0; $i < count(EXCEPTIONS_AUTHORIZE) ; $i++) { 
+    if(EXCEPTIONS_AUTHORIZE[$i] === Utils::getFunctionName()){
+        $isException = true;
+        break;    
+    } else {
+        $isException = false;
+    }
+}
+
+// Check if function is exception
+if($isException){
+    // Run request
+    Utils::runURLQuery();
+    // Send the response back
+    echo json_encode(Response::getResponse(), JSON_PRETTY_PRINT);
+    exit(0);
+}
+
+// Run Authorize and set response accourdingly
+$result = Auth::authorize();
+if($result['success']){
+    // Run request
+    Utils::runURLQuery();
+} else {
+    // Set response equel to the result of the authorization
+    Response::$response = $result;
+}
 
 // Send the response back
 echo json_encode(Response::getResponse(), JSON_PRETTY_PRINT);

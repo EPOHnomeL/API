@@ -78,4 +78,14 @@ class Sql {
         self::$conn->close();
         return $field;
     }
+
+    static function getUserField($username, $field){
+        // Execute the query
+        $result = Sql::execute(
+            "SELECT $field FROM users WHERE Username = '$username'"
+        );
+        // return the field as a value
+        return $result["$field"];
+    }
+    
 }

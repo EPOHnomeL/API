@@ -106,4 +106,8 @@ class Utils{
         // Return results
         return [$username, $password, $email, $role];
     }
+
+    static function getFunctionName(){
+        return self::$_funcName;
+    }
 }

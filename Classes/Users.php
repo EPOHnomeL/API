@@ -14,6 +14,13 @@ class Users {
         $tokenExpiry = 0;
         $dat = date('Y-m-d H:i:s');
 
+        // Check if username already exists
+        $result = Sql::getUserField($username, 'Email');
+        if (!empty($result)){
+            Response::setResponse("Username already used");
+            return;    
+        }
+
         // Insert user into database
         $result = Sql::execute(
             "INSERT INTO users(Username, `Password`, Email, Email_Confirmed, `Role`, Token_Expiry, Last_Login) ".
@@ -26,29 +33,6 @@ class Users {
         }
         // Send suceeded response back
         Response::setResponse('User created', true); 
-    }
-
-    function updateUserDetails() {
-        // Get the contents of the response from the frontend               
-        $json = file_get_contents('php://input');
-        // Decode it as an array
-        $result = json_decode($json, true);
-
-        // Get username and token data
-        list($username) = Utils::getUserDetails();
-        $newUsername = array_key_exists('newUsername', $result) ? Sql::sanitise($result['newUsername']) : '';
-        $newEmail = array_key_exists('newEmail', $result) ? Sql::sanitise($result['newEmail']) : '';
-
-        $result = Sql::update(
-            "UPDATE users SET Username = '$newUsername', Email = '$newEmail' WHERE Username = '$username'"
-        );
-        // Check if result failed
-        if(!$result){
-            Response::setResponse("Fail to update user information");
-            return;
-        }
-        // Send suceeded response back
-        Response::setResponse("User details updated", true);
     }
 
     // Gets all the current user in the database
@@ -64,12 +48,35 @@ class Users {
         Response::setResponse("Users retrieved", true, $result);
     }
 
+    // Deletes a user
     function deleteUser() {
         // code...
         Response::setResponse("User deleted", true);  
     }
 
-    function test(){
-        Response::setResponse("TEST SUCCEEDED", true);    
+    // Update Username and email
+    function updateUserDetails() {
+        // Get the contents of the response from the frontend               
+        $json = file_get_contents('php://input');
+        // Decode it as an array
+        $result = json_decode($json, true);
+
+        // Get username and token data
+        list($username) = Utils::getUserDetails(); 
+        $newUsername = array_key_exists('newUsername', $result) ? Sql::sanitise($result['newUsername']) : '';
+        $newEmail = array_key_exists('newEmail', $result) ? Sql::sanitise($result['newEmail']) : '';
+        // replace username with token
+        
+        $result = Sql::update(
+            "UPDATE users SET Username = '$newUsername', Email = '$newEmail' WHERE Username = '$username'"
+        );
+        // Check if result failed
+        if(!$result){
+            Response::setResponse("Fail to update user information");
+            return;
+        }
+        // Send suceeded response back
+        Response::setResponse("User details updated", true);
     }
+
 }
