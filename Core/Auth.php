@@ -8,19 +8,18 @@ class Auth{
 
         $result = array(
             'success' => true,
-            'message' => "Successfully authorized user"
+            'message' => "Successfully authorized user",
         );
-
-        // Get the contents of the response from the frontend               
-        $json = file_get_contents('php://input');
-        // Decode it as an array
-        $user = json_decode($json, true);
-
         // Get username and token data
-        list($username) = Utils::getUserDetails();
+        $username = Utils::getSentField('username');
         // Get the token from the database
-        $tokenIn = $user['token'];
-        $token = Sql::getUserField($username, 'Token');
+        $tokenIn = Utils::getSentField('token');
+        // Check if user is in database
+        if(!Sql::inDatabase($username, 'Username', 'users')){
+            Response::setResponse('User is not in databse');
+            return;
+        }
+        $token = Sql::getField($username, 'Token');
 
         // Check if tokens match
         if($tokenIn !== $token){
@@ -32,7 +31,7 @@ class Auth{
         }        
 
         // Get token Expiry and time
-        $tokenExpiry = Sql::getUserField($username, 'Token_Expiry');
+        $tokenExpiry = Sql::getField($username, 'Token_Expiry');
         $timeIn = time();
         // Check if time expired
         if($timeIn >= $tokenExpiry){

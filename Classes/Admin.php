@@ -8,7 +8,8 @@ class Admin {
      // Logs the user in and creates session
      function login(){
         // Get information from frontend
-        list($username, $password) = Utils::getUserDetails();
+        $username = Utils::getSentField('username');
+        $password = Utils::getSentField('password');
 
         // Check to see if user details are correct
         $validUser = Auth::checkUserDetails($username, $password);
@@ -36,23 +37,24 @@ class Admin {
         }
 
         // Get email from database
-         $email = Sql::getUserField($username, 'Email');
+         $email = Sql::getField($username, 'Email');
 
         // Successfully login user and send user details back to frontend
         $values = array( 
             'username'=> $username,
             'token' => $token,
-            'email' => $email, );
+            'email' => $email, 
+        );
         Response::setResponse("User session successfully created", true, $values);
     }
 
     // Logs the user out 
     function logout(){
         // Get username from fronend
-        list($username) = Utils::getUserDetails();
+        $username = Utils::getSentField('username');
 
         // Check if user exists         TODO : Remove
-        $result = Sql::getUserField($username, 'Email');
+        $result = Sql::getField($username, 'Email');
         if (empty($result)){
             Response::setResponse("Username does not exist");
             return;    
@@ -66,6 +68,26 @@ class Admin {
         }
         // Send token to user
         Response::setResponse("User successfully Logged Out", true);     
+    }
+
+    // Authorizing user using username and token.
+    function authorizeUser(){
+
+        // Run authorize function
+        $result = Auth::authorize();
+
+        // Set values of user
+        $values = '';
+        if($result['success']){
+            $username = Utils::getSentField('username');
+            $email = Sql::getField($username, 'Email');
+            $values = array(
+                'username' => $username,
+                'email' => $email
+            );
+        }
+        // Send response back
+        Response::setResponse($result['message'], $result['success'], $values);        
     }
 
 }

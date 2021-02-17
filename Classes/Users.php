@@ -7,15 +7,18 @@ class Users {
     // Creates a user and add it to the database
     function createUser(){
         // Gets the user details
-        list($username, $password, $email, $role) = Utils::getUserDetails();  
+        $username = Utils::getSentField('username');
+        $password = Utils::getSentField('password');
+        $email = Utils::getSentField('email');
+        $role = Utils::getSentField('role'); 
 
         // Initialize varibles
         $confirmed = 1;
         $tokenExpiry = 0;
-        $dat = date('Y-m-d H:i:s');
+        $date = date('Y-m-d H:i:s');
 
         // Check if username already exists
-        $result = Sql::getUserField($username, 'Email');
+        $result = Sql::getField($username, 'Email');
         if (!empty($result)){
             Response::setResponse("Username already used");
             return;    
@@ -24,7 +27,7 @@ class Users {
         // Insert user into database
         $result = Sql::execute(
             "INSERT INTO users(Username, `Password`, Email, Email_Confirmed, `Role`, Token_Expiry, Last_Login) ".
-            "VALUES('$username', '$password', '$email', '$confirmed', '$role', '$tokenExpiry', '$dat')"
+            "VALUES('$username', '$password', '$email', '$confirmed', '$role', '$tokenExpiry', '$date')"
         );
         // Check if response failed
         if($result === false){
@@ -62,7 +65,7 @@ class Users {
         $result = json_decode($json, true);
 
         // Get username and token data
-        list($username) = Utils::getUserDetails(); 
+        $username = Utils::getSentField('username');
         $newUsername = array_key_exists('newUsername', $result) ? Sql::sanitise($result['newUsername']) : '';
         $newEmail = array_key_exists('newEmail', $result) ? Sql::sanitise($result['newEmail']) : '';
         // replace username with token
@@ -78,5 +81,7 @@ class Users {
         // Send suceeded response back
         Response::setResponse("User details updated", true);
     }
+
+
 
 }

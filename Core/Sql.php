@@ -79,13 +79,37 @@ class Sql {
         return $field;
     }
 
-    static function getUserField($username, $field){
+    static function getField($username, $field){
         // Execute the query
         $result = Sql::execute(
             "SELECT $field FROM users WHERE Username = '$username'"
         );
         // return the field as a value
         return $result["$field"];
+    }
+
+    static function getUserDetails($username){
+        // Execute the query
+        $result = Sql::execute(
+            "SELECT * FROM users WHERE Username = '$username'"
+        );
+        // return the query as an assosiative array
+        return $result;
+
+    }
+
+    static function inDatabase($value, $field, $database){
+        // Execute the query
+        $result = Sql::execute(
+            "SELECT * FROM $database WHERE $field = '$value'"
+        );
+        // Check if value is false or not
+        if($result === false){
+            return false;
+        } else {
+            return true;
+        }
+
     }
     
 }

@@ -91,23 +91,32 @@ class Utils{
         $obj->$funcName(); 
     }    
 
-    static function getUserDetails(){    
+    static function getFunctionName(){
+        return self::$_funcName;
+    }
+
+    static function getSentField($field){
         // Get the contents of the response from the frontend               
         $json = file_get_contents('php://input');
         // Decode it as an array
         $user = json_decode($json, true);
 
-        // Sanitise all fields of user
-        $username = array_key_exists('username', $user) ? Sql::sanitise($user['username']) : '';
-        $password = array_key_exists('password', $user) ? Sql::sanitise($user['password']) : '';
-        $email = array_key_exists('email', $user) ? Sql::sanitise($user['email']) : '';
-        $role = array_key_exists('role', $user) ? Sql::sanitise($user['role']) : '';
-
-        // Return results
-        return [$username, $password, $email, $role];
+        // return the value otherwise empty string.
+        $result = array_key_exists("$field", $user) ? Sql::sanitise($user["$field"]) : '';
+        return $result;
     }
+    
+    static function getUserId($username){
+        // Run query to see if user is in database
+        $result = Sql::execute(
+            "SELECT Id FROM users WHERE Username = '$username'"
+        );
 
-    static function getFunctionName(){
-        return self::$_funcName;
+        // Check if response failed
+        if($result === false){
+            return false;
+        }
+        // Return userId
+        return $result['Id'];
     }
 }
